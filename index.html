@@ -3,40 +3,52 @@
 
 <body>
 
-    <h1>Covid-19 Vaccine Availability Finder</h1>
-    <label>Select State</label>
-    <select id="states" onchange=getDistricts()>
-    </select>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand">Covid-19 Vaccine Availability Finder</a>
+      
+    </nav>
+    <div class="container">
+    <form>
+        <div class="form-group">
+          <label for="states">State</label>
+          <select id="states" onchange=getDistricts()>
+        </select>
+        </div>
+        <div class="form-group">
+          <label for="district">District</label>
+          <select id="district">
+        </select>
+        </div>
+        <button onclick="getAvailability()" class="btn btn-primary btn-lg btn-block" type="submit" class="btn btn-primary">Search</button>
+      </form>
+
+
+
+   
+
 
     <br />
-
-
-    <label>Select District</label>
-    <select id="district">
-    </select>
-
-
-    <!-- <br />
-
-
-    <label>Date</label>
-    <input type="date" id="date" /> -->
-
     <br />
-    <br />
-    <button onclick="getAvailability()">Search</button>
-
-
-    <br />
-    <br />
-    <p>Checking again in <span id="timer"></span></p>
+    <div id="alert" class="alert alert-primary" role="alert" style="display: none;">
+        Not Available! 
+        <br/>
+        Checking again in <span id="timer"></span>
+      </div>
     <br />
 
     <div id="data"></div>
-
+</div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+    crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+    integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
     crossorigin="anonymous"></script>
 <script>
 
@@ -46,86 +58,85 @@
 
     const baseURL = 'https://cdn-api.co-vin.in/api/v2';
 
-    function setTimer(){
+    function setTimer() {
 
         var maxTicks = 30;
         var tickCount = 0;
-    var tick = function()
-    {
-        if (tickCount >= maxTicks)
-        {
-            clearInterval(myInterval);
-            getAvailability();
-            return;
-        }
-        document.getElementById("timer").innerHTML = (maxTicks - tickCount);
-        tickCount++;
-    };
-    
-    var myInterval = setInterval(tick, 1000);
-}
-    
+        var tick = function () {
+            if (tickCount >= maxTicks) {
+                clearInterval(myInterval);
+                getAvailability();
+                return;
+            }
+            document.getElementById("timer").innerHTML = (maxTicks - tickCount);
+            tickCount++;
+        };
+
+        var myInterval = setInterval(tick, 1000);
+    }
+
     function getAvailability() {
         var stateId = $("#states option:selected").val();
         var districtId = $("#district option:selected").val();
-        if(stateId > 0 && districtId > 0 ){
+        if (stateId > 0 && districtId > 0) {
+            // var selectedDate = $("#date option:selected").val();
+            var todaysDate = new Date();
+            const options = { dateStyle: 'short' };
+            const date = todaysDate.toLocaleString('hi-IN', options);
 
-        
-        // var selectedDate = $("#date option:selected").val();
-        var todaysDate = new Date();
-        const options = { dateStyle: 'short' };
-        const date = todaysDate.toLocaleString('hi-IN', options);
+            document.getElementById("data").innerHTML = "";
 
-        document.getElementById("data").innerHTML = "";
-
-        $.ajax({
-            type: 'GET',
-            url: baseURL + '/appointment/sessions/public/calendarByDistrict',
-            data: {
-                "district_id": districtId,
-                "date": date
-            },
-            success: function (resp) {
-            }
-        }).done(
-            function (response) {
-
-                let centerDatas = "";
-                if (response?.centers?.length > 0) {
-                    let availabilityFound = false;
-
-                    response.centers.forEach(center => {
-                        center.sessions.forEach(session => {
-                            if (session.available_capacity > 0) {
-                                availabilityFound = true;
-                            }
-                        });
-                    });
-
-                    if (availabilityFound) {
-                        play();
-                    } else {
-                        setTimer();
-                    }
-
-                    response.centers.forEach(element => {
-                        centerDatas += `
-                            <h1> ${element.name} (<span>${element.fee_type}</span>)</h1> 
-                            <p> ${element.address} </p>
-                            <p> ${element.from} - ${element.to}</p>
-                           
-                            <span>${getSessions(element.sessions)}</span>
-
-                        `
-                    })
-                } else {
-                    alert("No Centers are available!");
-                   
+            $.ajax({
+                type: 'GET',
+                url: baseURL + '/appointment/sessions/public/calendarByDistrict',
+                data: {
+                    "district_id": districtId,
+                    "date": date
+                },
+                success: function (resp) {
                 }
-                document.getElementById("data").innerHTML = centerDatas;
-            }).fail(function (data) {
-                alert("failed");
-            });
+            }).done(
+                function (response) {
+
+                    let centerDatas = "";
+                    if (response?.centers?.length > 0) {
+                        let availabilityFound = false;
+
+                        response.centers.forEach(center => {
+                            center.sessions.forEach(session => {
+                                if (session.available_capacity > 0) {
+                                    availabilityFound = true;
+                                }
+                            });
+                        });
+
+                        if (availabilityFound) {
+                            play();
+                            document.getElementById("alert").style ="display:none"
+                        } else {
+                            setTimer();
+                            document.getElementById("alert").style ="display:block"
+                        }
+
+                        response.centers.forEach(element => {
+                            centerDatas += `
+                            <div class="card p-3 m-2">
+                                <h5 class="card-title text-secondary">${element.name} <span class="badge badge-secondary">${element.fee_type}</span></h5>
+                                <p> ${element.address} </p>
+                                <p> ${element.from} - ${element.to}</p>
+                            
+                                <span>${getSessions(element.sessions)}</span>
+                            </div>
+                        `
+                        })
+                    } else {
+                        alert("No Centers are available!");
+
+                    }
+                    document.getElementById("data").innerHTML = centerDatas;
+                }).fail(function (data) {
+                    alert("failed");
+                });
         } else {
             alert("Select state and district!");
         }
@@ -140,7 +151,7 @@
                     sessionsData +=
                         `
                     <h4> Sessions </h4>
-                    <h4>Available Capacity : ${session.available_capacity}</h4>
+                    <h4 class="text-primary">Available Capacity : ${session.available_capacity}</h4>
                     <span>${getSlots(session)}</span>
                     `
                 }
@@ -157,13 +168,13 @@
                 `
                     <h6>Date : ${session.date}</h6>
                     <h6>Min Age Limit : ${session.min_age_limit}</h6>
-                    <h6>Slots </h6>
+                    <h6>Time Slots </h6>
                 `
             session.slots.forEach(slot => {
                 slotsData +=
                     `
                    
-                    <h6>Time  : ${slot}</h6>
+                    <h6>${slot}</h6>
                     
                 `
             })
@@ -172,7 +183,7 @@
     }
 
     function getDistricts() {
-
+        document.getElementById("data").innerHTML = "";
         var stateId = $("#states option:selected").val();
         $.ajax({
             type: 'GET',
