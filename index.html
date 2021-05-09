@@ -9,39 +9,40 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand">Covid-19 Vaccine Availability Finder</a>
-      
+
     </nav>
     <div class="container">
-    <form>
-        <div class="form-group">
-          <label for="states">State</label>
-          <select id="states" onchange=getDistricts()>
-        </select>
+        <div>
+            <div class="form-group">
+                <label for="states">State</label>
+                <select id="states" onchange=getDistricts()>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="district">District</label>
+                <select id="district">
+                </select>
+            </div>
+            <button onclick="getAvailability()" class="btn btn-primary btn-lg btn-block"
+                class="btn btn-primary">Search</button>
         </div>
-        <div class="form-group">
-          <label for="district">District</label>
-          <select id="district">
-        </select>
+
+
+
+
+
+
+        <br />
+        <br />
+        <div id="alert" class="alert alert-primary" role="alert" style="display: none;">
+            Not Available!
+            <br />
+            Checking again in <span id="timer"></span>
         </div>
-        <button onclick="getAvailability()" class="btn btn-primary btn-lg btn-block" class="btn btn-primary">Search</button>
-      </form>
+        <br />
 
-
-
-   
-
-
-    <br />
-    <br />
-    <div id="alert" class="alert alert-primary" role="alert" style="display: none;">
-        Not Available! 
-        <br/>
-        Checking again in <span id="timer"></span>
-      </div>
-    <br />
-
-    <div id="data"></div>
-</div>
+        <div id="data"></div>
+    </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
@@ -112,10 +113,10 @@
 
                         if (availabilityFound) {
                             play();
-                            document.getElementById("alert").style ="display:none"
+                            document.getElementById("alert").style = "display:none"
                         } else {
                             setTimer();
-                            document.getElementById("alert").style ="display:block"
+                            document.getElementById("alert").style = "display:block"
                         }
 
                         response.centers.forEach(element => {
