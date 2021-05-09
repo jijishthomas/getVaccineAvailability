@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+
+    <style>
+        /* Sticky footer styles
+-------------------------------------------------- */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body {
+            margin-bottom: 60px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            /* Set the fixed height of the footer here */
+            line-height: 60px;
+            /* Vertically center the text there */
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
 <body>
     <title>Covid-19 Vaccine Availability Finder by Jijish Thomas</title>
     <meta charset="UTF-8">
@@ -16,7 +43,7 @@
         <a class="navbar-brand">Covid-19 Vaccine Availability Finder</a>
 
     </nav>
-    <div class="container">
+    <div class="container mb-5">
         <div>
             <div class="form-group">
                 <label for="states">State</label>
@@ -34,9 +61,6 @@
 
 
 
-
-
-
         <br />
         <br />
         <div id="alert" class="alert alert-primary" role="alert" style="display: none;">
@@ -46,8 +70,16 @@
         </div>
         <br />
 
-        <div id="data"></div>
+        <div id="data" class="mb-5"></div>
     </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted">A social responsibility Initiative</span>
+        </div>
+    </footer>
+
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
