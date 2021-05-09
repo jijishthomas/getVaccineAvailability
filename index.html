@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h1>Covid-19 Vaccine Availability Finder</h1>
+    <label>Select State</label>
+    <select id="states" onchange=getDistricts()>
+    </select>
+
+    <br />
+
+
+    <label>Select District</label>
+    <select id="district">
+    </select>
+
+
+    <!-- <br />
+
+
+    <label>Date</label>
+    <input type="date" id="date" /> -->
+
+    <br />
+    <br />
+    <button onclick="getAvailability()">Search</button>
+
+
+    <br />
+    <br />
+    <p>Checking again in <span id="timer"></span></p>
+    <br />
+
+    <div id="data"></div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+    integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+    crossorigin="anonymous"></script>
+<script>
+
+    $(function () {
+        getStates();
+    })
+
+    const baseURL = 'https://cdn-api.co-vin.in/api/v2';
+
+    function setTimer(){
+
+        var maxTicks = 30;
+        var tickCount = 0;
+    var tick = function()
+    {
+        if (tickCount >= maxTicks)
+        {
+            clearInterval(myInterval);
+            getAvailability();
+            return;
+        }
+        document.getElementById("timer").innerHTML = (maxTicks - tickCount);
+        tickCount++;
+    };
+    
+    var myInterval = setInterval(tick, 1000);
+}
+    
+    function getAvailability() {
+        var stateId = $("#states option:selected").val();
+        var districtId = $("#district option:selected").val();
+        if(stateId > 0 && districtId > 0 ){
+
+        
+        // var selectedDate = $("#date option:selected").val();
+        var todaysDate = new Date();
+        const options = { dateStyle: 'short' };
+        const date = todaysDate.toLocaleString('hi-IN', options);
+
+        document.getElementById("data").innerHTML = "";
+
+        $.ajax({
+            type: 'GET',
+            url: baseURL + '/appointment/sessions/public/calendarByDistrict',
+            data: {
+                "district_id": districtId,
+                "date": date
+            },
+            success: function (resp) {
+            }
+        }).done(
+            function (response) {
+
+                let centerDatas = "";
+                if (response?.centers?.length > 0) {
+                    let availabilityFound = false;
+
+                    response.centers.forEach(center => {
+                        center.sessions.forEach(session => {
+                            if (session.available_capacity > 0) {
+                                availabilityFound = true;
+                            }
+                        });
+                    });
+
+                    if (availabilityFound) {
+                        play();
+                    } else {
+                        setTimer();
+                    }
+
+                    response.centers.forEach(element => {
+                        centerDatas += `
+                            <h1> ${element.name} (<span>${element.fee_type}</span>)</h1> 
+                            <p> ${element.address} </p>
+                            <p> ${element.from} - ${element.to}</p>
+                           
+                            <span>${getSessions(element.sessions)}</span>
+
+                        `
+                    })
+                } else {
+                    alert("No Centers are available!");
+                   
+                }
+                document.getElementById("data").innerHTML = centerDatas;
+            }).fail(function (data) {
+                alert("failed");
+            });
+        } else {
+            alert("Select state and district!");
+        }
+    }
+
+    function getSessions(sessions) {
+        var sessionsData = "";
+        if (sessions?.length > 0) {
+            sessions.forEach(session => {
+                if (session.available_capacity > 0) {
+
+                    sessionsData +=
+                        `
+                    <h4> Sessions </h4>
+                    <h4>Available Capacity : ${session.available_capacity}</h4>
+                    <span>${getSlots(session)}</span>
+                    `
+                }
+            })
+        }
+        return sessionsData;
+    }
+
+    function getSlots(session) {
+        var slotsData = "";
+
+        if (session?.slots?.length > 0 && session.available_capacity > 0) {
+            slotsData +=
+                `
+                    <h6>Date : ${session.date}</h6>
+                    <h6>Min Age Limit : ${session.min_age_limit}</h6>
+                    <h6>Slots </h6>
+                `
+            session.slots.forEach(slot => {
+                slotsData +=
+                    `
+                   
+                    <h6>Time  : ${slot}</h6>
+                    
+                `
+            })
+        }
+        return slotsData;
+    }
+
+    function getDistricts() {
+
+        var stateId = $("#states option:selected").val();
+        $.ajax({
+            type: 'GET',
+            url: baseURL + '/admin/location/districts/' + stateId,
+            success: function (resp) {
+            }
+        }).done(
+            function (response) {
+                let districtsOptionsHTML = "";
+                if (response?.districts?.length > 0) {
+                    response.districts.forEach(element => {
+                        districtsOptionsHTML += `
+                    <option value="${element.district_id}"> ${element.district_name} </option>`
+                    });
+                    document.getElementById("district").innerHTML = districtsOptionsHTML;
+                }
+            }).fail(function (data) {
+                alert("failed");
+            });
+    }
+
+    function getStates() {
+        $.ajax({
+            type: 'GET',
+            url: baseURL + '/admin/location/states',
+
+            success: function (resp) {
+            }
+        }).done(
+            function (response) {
+                let statesOptionsHTML = "<option selected> Select State </option> ";
+                if (response?.states?.length > 0) {
+                    response.states.forEach(element => {
+                        statesOptionsHTML += `
+                    <option value="${element.state_id}"> ${element.state_name} </option>`
+                    });
+                    document.getElementById("states").innerHTML = statesOptionsHTML;
+                }
+            }).fail(function (data) {
+                alert("failed");
+            });
+    }
+
+    function play() {
+        var audio = new Audio('alert.mp3');
+        audio.play();
+    }
+</script>
+
+</html>
