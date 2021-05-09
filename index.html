@@ -64,9 +64,16 @@
         <br />
         <br />
         <div id="alert" class="alert alert-primary" role="alert" style="display: none;">
-            Not Available!
-            <br />
-            Checking again in <span id="timer"></span>
+            <div class="row">
+                <div class="col"> Not Available!
+                    <br />
+                    Retrying in <span id="timer"></span>s<br />
+                </div>
+                <div class="col"><span class="float-right">Attempt Count:<span id="attemptCount"></span> </span></div>
+            </div>
+
+
+
         </div>
         <br />
 
@@ -76,7 +83,8 @@
 
     <footer class="footer">
         <div class="container">
-            <span class="text-muted"><span style="color:red">&#9825;</span>  A social responsibility Initiative | Stay Home, Stay Safe! </span></br>
+            <span class="text-muted"><span style="color:red">&#10084;</span> A social responsibility Initiative | Stay
+                Home, Stay Safe! </span></br>
         </div>
     </footer>
 
@@ -94,16 +102,21 @@
         getStates();
     })
 
+    var attemptCount = 1;
+
     const baseURL = 'https://cdn-api.co-vin.in/api/v2';
 
     function setTimer() {
-
+        document.getElementById("attemptCount").innerHTML = attemptCount;
         var maxTicks = 30;
         var tickCount = 0;
         var tick = function () {
             if (tickCount >= maxTicks) {
                 clearInterval(myInterval);
                 getAvailability();
+
+                attemptCount++;
+                document.getElementById("attemptCount").innerHTML = attemptCount;
                 return;
             }
             document.getElementById("timer").innerHTML = (maxTicks - tickCount);
