@@ -1,0 +1,109 @@
+.card{
+
+	border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+	border: 1px solid rgb(233 240 242);
+	margin-bottom: 10px;
+	color:#000;
+}
+.imgBlock{
+	text-align: center;
+}
+.mainBlock{
+	margin-top:40px;
+    background: #26737B;
+   
+    color: #fff;
+    border-radius: 6px;
+	margin-bottom: 30px;
+	-webkit-box-shadow:  0 8px 16px 0 rgba(0,0,0,0.2);
+	-moz-box-shadow:  0 8px 16px 0 rgba(0,0,0,0.2);
+	box-shadow:  0 8px 16px 0 rgba(0,0,0,0.2);
+	padding-left: 0px;
+	padding-right: 0px;
+}
+.block-pad{
+	padding: 30px;
+}
+.btn-reset{
+	background: #D1E0E3;
+    border: none;
+    color: #26737B;
+    font-weight: 600;
+    font-size: 18px;
+    height: 45px;
+    border-radius: 20px;
+}
+.btn-reset:hover,.btn-reset:focus{
+	background: #D1E0E3;
+    border: none;
+    color: #26737B;
+    font-weight: 600;
+    font-size: 18px;
+    height: 45px;
+    border-radius: 20px;
+}
+.headerName{
+	text-align: center;
+    font-size: 25px;
+    margin: 0 auto;
+    font-weight: 500;
+}
+.alert-notify{
+	background-color: #ffffff;
+}
+.alert-texter{
+	color: #c92020;
+}
+.form-field{
+	height:45px;
+	background: #fff url(images/search-arrow.png)right no-repeat;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border-radius: 1px;
+}
+.btn-search{
+	margin-top: 30px;
+	background: #D1E0E3;
+    border: none;
+    color: #26737B;
+    font-weight: 600;
+    font-size: 18px;
+    height: 45px;
+    border-radius: 20px;
+}
+.btn-search:hover,.btn-search:focus{
+	background: none;color: #fff;border:1px solid #fff;
+}
+
+.card-TitleHead{
+	color: #248d98!important;
+    font-size: 19px;
+	margin-bottom: 0px;
+	font-weight: 600;
+}
+.card-address{
+	color: #092839;
+    font-weight: 500;
+    font-size: 17px;
+}
+.data-head{
+	padding: 16px;
+	
+}
+.session-slot{
+	background: '#ccc';
+}
+.avail-num{
+	margin-bottom: 10px;
+}
+.session-area{
+	margin-bottom: 7px;	color: #1c4358!important;
+}
+.bord-btm{
+	background: #92b6d5;
+    width: 37px;
+    height: 2px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
