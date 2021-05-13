@@ -192,9 +192,9 @@
                         response.centers.forEach(element => {
                             centerDatas += `
                             <div class="card p-3 m-2">
-                                <h5 class="card-title text-secondary">${element.name} <span class="badge badge-secondary">${element.fee_type}</span></h5>
-                                <p> ${element.address} </p>
-                                <p> ${element.from} - ${element.to}</p>
+                                <h5 class="card-title text-secondary">${element.name} <span class="badge badge-success">${element.fee_type} Vaccine</span></h5>
+                                <p><strong>Address </strong> : ${element.address} </p>
+                                <p> &#128337; ${element.from} - ${element.to}</p>
                             
                                 <span>${getSessions(element.sessions)}</span>
                             </div>
