@@ -64,9 +64,10 @@
 }
 .btn-search{
 	margin-top: 30px;
-	background: #D1E0E3;
+	/* background: #0567f0; */
+    background-color: rgb(241, 115, 108);
     border: none;
-    color: #26737B;
+    color: white;
     font-weight: 600;
     font-size: 18px;
     height: 45px;

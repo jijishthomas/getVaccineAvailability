@@ -50,64 +50,56 @@
 
 <body>
     
-
-
     <div class="container mb-5">
-	<div class="row">
-		<div class="col-sm-3"></div>
-		 <div class="col-sm-6 mainBlock" >
-             <div class="block-pad">
-
-           <div class="imgBlock">
-               <img src="images/pngLogo.png" alt="Covid vaccine finder"  class="img-responsive"/>
-           </div>
-			<div class="headerName">
-              <span style="font-size: 30px;"><b>Covid-19</b> </span> <br> Vaccine Availability Finder
-            </div>
-        <div style="margin-top:30px;margin-bottom:30px;">
-            <div class="form-group">
-                <label for="states">State</label>
-                <select id="states" class="form-control form-field" onchange=getDistricts()>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="district">District</label>
-                <select id="district" class="form-control form-field" >
-                </select>
-            </div>
-        <button onclick="getAvailability()" class="btn btn-search btn-lg btn-block"
-                id="searchButton">Search</button>
-                <button onclick="resetSearch()" class="btn btn-reset btn-lg btn-block"
-                    id="resetButton" style="display: none;">Reset</button>
-                     </div>
-
-
-        <div id="alert" class="alert alert-primary alert-notify" role="alert" style="display: none;">
-            <div class="row alert-texter">
-                <div class="col"> Not Available!
-                    <br />
-                    Retrying in <span id="timer"></span>s<br />
+        <div class="row">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6 mainBlock">
+                <div class="block-pad">
+    
+                    <div class="imgBlock">
+                        <img src="images/pngLogo.png" alt="Covid vaccine finder" class="img-responsive" />
+                    </div>
+                    <div class="headerName">
+                        <span style="font-size: 30px;"><strong>Covid-19</strong></span> <br/> Vaccine Availability Finder
+                    </div>
+                    <div style="margin-top:30px;margin-bottom:30px;">
+                        <div class="form-group">
+                            <label for="states">State</label>
+                            <select id="states" class="form-control form-field" onchange=onStateChange()>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District</label>
+                            <select id="district" class="form-control form-field" onchange=onDistrictChange()>
+                            </select>
+                        </div>
+                        <button onclick="getAvailability()" class="btn btn-search btn-lg btn-block"
+                            id="searchButton">Search</button>
+                        <button onclick="resetSearch()" class="btn btn-reset btn-lg btn-block" id="resetButton"
+                            style="display: none;">Reset</button>
+                    </div>
+    
+    
+                    <div id="alert" class="alert alert-primary alert-notify" role="alert" style="display: none;">
+                        <div class="row alert-texter">
+                            <div class="col"> Not Available!
+                                <br />
+                                Retrying in <span id="timer"></span>s<br />
+                            </div>
+                            <div class="col"><span class="float-right">Attempt Count: <span id="attemptCount"></span> </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col"><span class="float-right">Attempt Count:<span id="attemptCount"></span> </span></div>
+                <div id="data"></div>
             </div>
-
-
-
+            <div class="col-sm-3"></div>
         </div>
-      
-    </div>
-        
-        <div id="data"></div>
-		
-		</div>
-		<div class="col-sm-3"></div>
-	
-	</div>
     </div>
 
 
     <footer class="footer">
-        <div class="container">
+        <div class="container" style="text-align: center;">
             <span class="text-muted"><span style="color:red">&#10084;</span> Social responsibility Initiative by <a
                     href="https://www.facebook.com/jijishthomas"> Jijish</a>
             </span></br>
@@ -129,6 +121,7 @@
     })
 
     var attemptCount = 1;
+    var myInterval;
 
     const baseURL = 'https://cdn-api.co-vin.in/api/v2';
 
@@ -149,7 +142,7 @@
             tickCount++;
         };
 
-        var myInterval = setInterval(tick, 1000);
+        myInterval = setInterval(tick, 1000);
     }
 
     function resetSearch(){
@@ -188,32 +181,63 @@
 
                         response.centers.forEach(center => {
                             center.sessions.forEach(session => {
-                                if (session.available_capacity > 0) {
+                                if (Math.floor(session.available_capacity) > 0) {
                                     availabilityFound = true;
+                                    center.available = true;
                                 }
                             });
                         });
 
+                        response.centers.sort(function compare(centerA, centerB) {
+                            const maxAvailabilityCenterA = centerA.sessions.reduce((accumulator, session) => {
+                                if (Math.floor(session.available_capacity) > 0) {
+                                    if (!accumulator) {
+                                        accumulator = true;
+                                    }
+                                }
+                                return accumulator;
+                            }, false);
+                            const maxAvailabilityCenterB = centerB.sessions.reduce((accumulator, session) => {
+                                if (Math.floor(session.available_capacity) > 0) {
+                                    if (!accumulator) {
+                                        accumulator = true;
+                                    }
+                                }
+                                return accumulator;
+                            }, false);
+
+                            if (maxAvailabilityCenterA && !maxAvailabilityCenterB) {
+                                return -1;
+                            }
+                            if (!maxAvailabilityCenterA && maxAvailabilityCenterB) {
+                                return 1;
+                            }
+                            // a must be equal to b
+                            return 0;
+                        });
+
                         if (availabilityFound) {
                             play();
-                            document.getElementById("alert").style = "display:none"
+                            document.getElementById("alert").style = "display:none";
                         } else {
                             setTimer();
-                            document.getElementById("alert").style = "display:block"
+                            document.getElementById("alert").style = "display:block";
                         }
 
-                        response.centers.forEach(element => {
+                        response.centers.forEach(center => {
                             centerDatas += `
-                            <div class="card">
-                                <div class="data-head"><h5 class="card-title text-secondary card-TitleHead">${element.name} 
-                                <span class="badge badge-success">${element.fee_type} Vaccine</span></h5>
+                            <div class="card" style="margin: 0 10px 10px 10px; ${!center.available && 'background-color: gainsboro;'}">
+                                <div class="data-head"><h5 class="card-title text-secondary card-TitleHead">${center.name} 
+                                    ${center.available ?
+                                        '<span class="badge badge-success">Available</span>' :
+                                        '<span class="badge badge-danger">Not Available</span>'} <span class="badge badge-info">${center.fee_type} Vaccine</span></h5>
                                 </div>
                                <div class="p-3">
-                                <p><img src="images/home.png" alt="time" height="18" width="18" class="img-responsive"/><span class="card-address"> Address</span>: ${element.address} </p>
-                                <p><img src="images/clock.png" alt="time" height="18" width="18" class="img-responsive"/> ${element.from} - ${element.to}</p>
+                                <p><img src="images/home.png" alt="time" height="18" width="18" class="img-responsive"/><span class="card-address"> Address</span>: ${center.address} </p>
+                                <p><img src="images/clock.png" alt="time" height="18" width="18" class="img-responsive"/> ${center.from} - ${center.to}</p>
                             
                                
-                                <span>${getSessions(element.sessions)}</span>
+                                <span>${getSessions(center.sessions)}</span>
                             </div>
                                 </div>
                         `
@@ -235,14 +259,14 @@
         var sessionsData = "";
         if (sessions?.length > 0) {
             sessions.forEach(session => {
-                if (session.available_capacity > 0) {
+                if (Math.floor(session.available_capacity) > 0) {
 
                     sessionsData +=
                         `
                        
                     <h5 class="card-TitleHead session-area"> Sessions </h5>
                     <div class="bord-btm"></div>
-                    <h5 class="text-primary card-TitleHead avail-num">Available Capacity : ${session.available_capacity}</h5>
+                    <h5 class="text-primary card-TitleHead avail-num">Available Capacity : ${Math.floor(session.available_capacity)}</h5>
                     
                     <span>${getSlots(session)}</span>
                    
@@ -256,7 +280,7 @@
     function getSlots(session) {
         var slotsData = "";
 
-        if (session?.slots?.length > 0 && session.available_capacity > 0) {
+        if (session?.slots?.length > 0 && Math.floor(session.available_capacity) > 0) {
             slotsData +=
                 `
                     <p><span class="card-address">Date </span>: ${session.date}</p>
@@ -273,6 +297,21 @@
             })
         }
         return slotsData;
+    }
+
+    function onStateChange(params) {
+        getDistricts();
+        document.getElementById("alert").style = "display:none";
+        clearInterval(myInterval);
+        document.getElementById("searchButton").disabled = false;
+        // document.getElementById("data").innerHTML = '';
+    }
+
+    function onDistrictChange(params) {
+        document.getElementById("alert").style = "display:none";
+        clearInterval(myInterval);
+        document.getElementById("searchButton").disabled = false;
+        document.getElementById("data").innerHTML = '';
     }
 
     function getDistricts() {
