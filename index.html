@@ -65,6 +65,10 @@
                 <select id="district" class="form-control" >
                 </select>
             </div>
+			 <div class="form-group">
+				<label for="pincode">Search by Pincode:  </label><input type="checkbox" id="pincodeSearch" name="Search by Pincode" onclick="SearchBox()" autocomplete="off" >
+                <input type="number" id="pincode" class="form-control" style="visibility:hidden" >
+            </div>
             <button onclick="getAvailability()" class="btn btn-primary btn-lg btn-block"
                 id="searchButton">Search</button>
             <button onclick="resetSearch()" class="btn btn-primary btn-lg btn-block"
@@ -146,8 +150,64 @@
     function getAvailability() {
         document.getElementById("searchButton").disabled = true; 
         document.getElementById("resetButton").style = "display:block"
+		
+		var checkBox = document.getElementById("pincodeSearch");
+		 if (checkBox.checked == true){
+			var pincodeval = document.getElementById("pincode").value;
+			var todaysDate = new Date();
+            const options = { dateStyle: 'short' };
+            const date = todaysDate.toLocaleString('hi-IN', options);
+            document.getElementById("data").innerHTML = "";
 
-        var stateId = $("#states option:selected").val();
+            $.ajax({
+                type: 'GET',
+                url: baseURL + '/appointment/sessions/public/findByPin',
+                data: {
+                    "pincode": pincodeval,
+                    "date": date
+                },
+                success: function (resp) {
+                }
+            }).done(
+                function (response) {
+					let centerDatas = "";
+                    if (response?.sessions?.length > 0) {
+                        let availabilityFound = false;
+                        response.sessions.forEach(center => {
+                                if (center.available_capacity > 0) {
+                                    availabilityFound = true;
+                                }
+                        });
+
+                        if (availabilityFound) {
+                            play();
+                            document.getElementById("alert").style = "display:none"
+                        } else {
+                            setTimer();
+                            document.getElementById("alert").style = "display:block"
+                        }
+
+                        response.sessions.forEach(element => {
+                            centerDatas += `
+                            <div class="card p-3 m-2">
+                                <h5 class="card-title text-secondary">${element.name} <span class="badge badge-success">${element.fee_type} Vaccine</span></h5>
+                                <p><strong>Address </strong> : ${element.address} </p>
+                                <p> &#128337; ${element.from} - ${element.to}</p>
+                            
+                                <span>${getSessions(element.sessions)}</span>
+                            </div>
+                        `
+                        })
+                    } else {
+                        alert("No Centers are available!");
+
+                    }
+                    document.getElementById("data").innerHTML = centerDatas;
+                }).fail(function (data) {
+                    alert("failed");
+                });
+		 } else { //if state and district search
+		var stateId = $("#states option:selected").val();
         var districtId = $("#district option:selected").val();
         if (stateId > 0 && districtId > 0) {
             // var selectedDate = $("#date option:selected").val();
@@ -168,7 +228,6 @@
                 }
             }).done(
                 function (response) {
-
                     let centerDatas = "";
                     if (response?.centers?.length > 0) {
                         let availabilityFound = false;
@@ -176,6 +235,7 @@
                         response.centers.forEach(center => {
                             center.sessions.forEach(session => {
                                 if (session.available_capacity > 0) {
+			
                                     availabilityFound = true;
                                 }
                             });
@@ -210,8 +270,9 @@
                 });
         } else {
             alert("Select state and district!");
-        }
-    }
+        } 
+	}//else checkbox
+    }//function
 
     function getSessions(sessions) {
         var sessionsData = "";
@@ -302,6 +363,15 @@
         var audio = new Audio('alert.mp3');
         audio.play();
     }
+	function SearchBox() {
+		 var checkBox = document.getElementById("pincodeSearch");
+		// If the checkbox is checked, display the output text
+		 if (checkBox.checked == true){
+		document.getElementById("pincode").style.visibility = "visible";
+		} else {
+		document.getElementById("pincode").style.visibility = "hidden";
+		}
+	}
 </script>
 
 </html>
